@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
-    "typeRoots": ["src/@types", "node_modules/@types"],
     "module": "commonjs",
-    "noImplicitReturns": false,
-    "noUnusedLocals": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017",
-    "esModuleInterop": true,
-    "resolveJsonModule": true
+    "target": "es2017"
   },
   "compileOnSave": true,
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

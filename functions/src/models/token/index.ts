@@ -25,11 +25,21 @@ export const addToken = async (token: TokenDocument) => {
   }
 };
 
-export const deleteToken = async (id: string) => {
+export const deleteToken = async (user_id: string) => {
   try {
-    const docRef = db.collection(COLLECTION_KEY).doc(id).withConverter(converter);
-    await docRef.delete();
-    return Promise.resolve();
+    const tokenCollection = db.collection(COLLECTION_KEY).withConverter(converter);
+    const querySnapshot = await tokenCollection.where('user_id', '==', user_id).get();
+
+    if (querySnapshot.empty) {
+      throw new Error('No tokens found for the provided user ID');
+    }
+    const batch = db.batch();
+
+    querySnapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    return Promise.resolve(true);
   } catch (err) {
     return Promise.reject(err);
   }

@@ -1,4 +1,4 @@
-import express from 'express';
+import * as express from 'express';
 import { Request, Response, NextFunction } from 'express';
 import { HttpException } from '../utils/apiErrorHandler';
 
@@ -9,7 +9,6 @@ export const errorHandler = (app: express.Application) => {
     if (err instanceof HttpException) {
       return res.status(Number(err.statusCode) || 500).json(err);
     }
-
-    res.status(err.statusCode || 500).json(err);
+    return res.status(err.statusCode || 500).json(err);
   });
 };

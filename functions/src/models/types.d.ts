@@ -1,1 +1,1 @@
-type WithSnapshotId<T> = T & { id: string };
+export type WithSnapshotId<T> = T & { id: string };

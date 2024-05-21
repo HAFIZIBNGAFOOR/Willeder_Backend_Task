@@ -7,8 +7,4 @@ typings/
 
 # Node.js dependency directory
 node_modules/
-
-yarn.lock
-lib
-
-src/utils/serviceAccounts
+*.local

@@ -1,4 +1,4 @@
-import express from 'express';
+import * as express from 'express';
 
 import authComponent from './auth';
 import accountComponent from './account';

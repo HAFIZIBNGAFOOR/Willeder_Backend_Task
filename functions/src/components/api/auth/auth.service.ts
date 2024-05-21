@@ -1,23 +1,40 @@
 import { logger } from 'firebase-functions/v1';
 import {
   badImplementationException,
-  dataConflictException,
   dataNotExistException,
   HttpException,
   invalidException,
 } from '../../../utils/apiErrorHandler';
 import { sendMessage } from '../../../utils/sgMailer';
 import { hashPassword } from '../../../utils/bcrypt';
-import { v4 as uuidv4 } from 'uuid';
+import * as uuid from 'uuid';
 import { getAddToCurrentJST, getCurrentJST } from '../../../utils/dayjs';
 import { TokenDocument } from '../../../models/token/token.entity';
 import { addToken, deleteToken, getToken } from '../../../models/token';
 import { MESSAGE_RESET_PASSWORD } from './auth.message';
-// import { addUser, getUserByEmail, updateUserFields } from '../../../models/user';
-// import { UserDocument } from '../../../models/user/user.entity';
+import { UserDocument } from '../../../models/user/user.entity';
+import { addUser, updateUserPassword } from '../../../models/user';
 
-export const createUser = async (email: string, password: string, name: string, phone: string, address: string) => {
-  // TODO
+
+const uuidv4 = uuid.v4
+export const createUser = async (email: string, password: string, name: string, phone: number, address: string) => {
+  const hashedPassword = await hashPassword(password)
+  const newUser: UserDocument = {
+    user_id: uuidv4(),
+    email,
+    password:hashedPassword, 
+    name,
+    phone,
+    address,
+    refresh_token:null,
+    status:'active',
+    updated_at:getCurrentJST(),
+    user_type: 'user', 
+    created_at: getCurrentJST(),
+    deleted_at: null,
+  };
+  await addUser(newUser);
+  return Promise.resolve('success');
 };
 
 export const forgotPassword = async (user: UserDocument) => {
@@ -29,15 +46,11 @@ export const forgotPassword = async (user: UserDocument) => {
       token_type: 'resetPassword',
       user_type: 'user',
       created_at: getCurrentJST(),
-      expired_at: getAddToCurrentJST(1, 'h'),
+      expired_at: getAddToCurrentJST(1,'h'),
     };
-
     await addToken(newToken);
-
     const tokenUrl = process.env.FRONTEND_URL + '/user/password/reset/' + newToken.token_id;
-
     await sendMessage(MESSAGE_RESET_PASSWORD(user.email, tokenUrl));
-
     return Promise.resolve('success');
   } catch (err) {
     logger.error(err);
@@ -53,16 +66,13 @@ export const updatePassword = async (password: string, tokenId: string) => {
     if (!token) throw dataNotExistException('Token does not exist');
     if (token.user_type !== 'user') throw invalidException('Token is not valid user type');
     if (token.token_type !== 'resetPassword') throw invalidException('Token is not valid token type');
-
-    // TODO
-    // await updateUserFields(token.user_id, { password: hashPassword(password), updated_at: getCurrentJST() });
-
+    await updateUserPassword(password,token.user_id)
     await deleteToken(tokenId);
-
-    return Promise.resolve();
+    return Promise.resolve(true);
   } catch (err) {
     console.log(err);
     error = err instanceof Error ? err : badImplementationException(err);
     return Promise.reject(error);
   }
 };
+

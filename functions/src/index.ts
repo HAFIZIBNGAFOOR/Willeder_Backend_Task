@@ -1,13 +1,12 @@
-import dotenv from 'dotenv';
+import  * as dotenv from 'dotenv';
 dotenv.config();
 
 import * as functions from 'firebase-functions/v1';
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
+import  * as express from 'express';
+import  * as cors from 'cors';
+import  * as cookieParser from 'cookie-parser';
 import { registerComponents } from './components';
 import { errorHandler } from './middlewares/errorHandler';
-
 const app = express();
 
 const COOKIE_SECRET = process.env.COOKIE_SECRET as string;

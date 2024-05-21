@@ -1,4 +1,5 @@
 import { DocumentData, FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase-admin/firestore';
+import { WithSnapshotId } from '../types';
 
 /**
  * Firestoreに保存するデータの型
@@ -6,7 +7,7 @@ import { DocumentData, FirestoreDataConverter, QueryDocumentSnapshot } from 'fir
 export type TokenDocument = {
   token_id: string;
   user_id: string;
-  token_type: 'resetPassword';
+  token_type: 'resetPassword' |' access '| 'refresh';
   user_type: 'admin' | 'user';
   created_at: string;
   expired_at: string;
